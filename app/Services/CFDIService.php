@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\DTO\CFDIDto;
 use GuzzleHttp\Client;
 
 class CFDIService
@@ -21,12 +22,23 @@ class CFDIService
         ]);
     }
 
-    public function index( array $params )
+    public function index( CFDIDto $params )
     {
         try {
-            $response = $this->client->request( 'GET', '/api/v4/cfdi/list' );
+            $response = $this->client->request( 'GET', '/api/v4/cfdi/list', [
+                'query' => [
+                    'page' => $params->page,
+                    'per_page' => $params->per_page,
+                    'month' => $params->month,
+                    'year' => $params->year,
+                    'rfc' => $params->rfc
+                ]
+            ] );
             $responseBody = json_decode( $response->getBody()->getContents(), true );
-            dd( $responseBody );
+            return [
+                'data' => $responseBody['data'],
+                'total' => $responseBody['total']
+            ];
         } catch ( \Exception $e ) {
             throw new \Exception( $e->getMessage() );
         }

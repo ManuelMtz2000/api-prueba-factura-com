@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CFDI;
+use App\DTO\CFDIDto;
 use App\Services\CFDIService;
 use Illuminate\Http\Request;
 
@@ -19,6 +19,9 @@ class CFDIController extends Controller
 
     public function index()
     {
-        $this->cfdiService->index( $this->request->all() );
+        $cfdiDto = CFDIDto::fromRequest( $this->request->query() );
+        $data = $this->cfdiService->index( $cfdiDto );
+        
+        return response()->json( $data, 200 );
     }
 }
