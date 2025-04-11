@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\DTO\CreateClientDto;
 use GuzzleHttp\Client;
 
 class ClientsService
@@ -21,10 +22,43 @@ class ClientsService
         ]);
     }
 
-    public function index( array $params )
+    public function index()
     {
         try {
-            
+            $response = $this->client->request( 'GET', '/api/v1/clients' );
+
+            $responseBody = json_decode( $response->getBody()->getContents(), true );
+            return $responseBody['data'];
+        } catch ( \Exception $e ) {
+            throw new \Exception( $e->getMessage() );
+        }
+    }
+
+    public function add( CreateClientDto $params )
+    {
+        try {
+            $response = $this->client->request( 'POST', '/api/v1/clients', [
+                'json' => $params
+            ]);
+
+            $responseBody = json_decode( $response->getBody()->getContents(), true );
+            return $responseBody['Data'];
+        } catch ( \Exception $e ) {
+            throw new \Exception( $e->getMessage() );
+        }
+    }
+
+    public function search( string $param )
+    {
+        try {
+            $response = $this->client->request( 'GET', '/api/v1/clients/' . $param );
+            $responseBody = json_decode( $response->getBody()->getContents(), true );
+
+            if ( $responseBody['status'] == 'error' ) {
+                throw new \Exception( $responseBody['message'] );
+            }
+
+            return $responseBody['Data'];
         } catch ( \Exception $e ) {
             throw new \Exception( $e->getMessage() );
         }

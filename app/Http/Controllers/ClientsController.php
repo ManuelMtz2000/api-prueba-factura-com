@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Client;
+use App\DTO\CreateClientDto;
 use App\Services\ClientsService;
 use Illuminate\Http\Request;
 
@@ -19,6 +19,29 @@ class ClientsController extends Controller
 
     public function index() 
     {
-        $this->clientsService->index( $this->request->all() );
+        $data = $this->clientsService->index();
+        return response()->json([
+            'status' => 'sucess',
+            'data' => $data
+        ], 200 );
+    }
+
+    public function add()
+    {
+        $params = CreateClientDto::fromRequest( $this->request->all() );
+        $data = $this->clientsService->add( $params );
+        return response()->json([
+            'status' => 'success',
+            'data' => $data
+        ], 200);
+    }
+
+    public function show( string $param )
+    {
+        $data = $this->clientsService->search( $param );
+        return response()->json([
+            'status' => 'success',
+            'data' => $data
+        ], 200);
     }
 }
