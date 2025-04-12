@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\DTO\CreateClientDto;
+use App\DTO\GetClientDto;
+use App\DTO\UpdateClientDto;
 use GuzzleHttp\Client;
 
 class ClientsService
@@ -37,7 +39,7 @@ class ClientsService
     public function add( CreateClientDto $params )
     {
         try {
-            $response = $this->client->request( 'POST', '/api/v1/clients', [
+            $response = $this->client->request( 'POST', '/api/v1/clients/create', [
                 'json' => $params
             ]);
 
@@ -59,6 +61,39 @@ class ClientsService
             }
 
             return $responseBody['Data'];
+        } catch ( \Exception $e ) {
+            throw new \Exception( $e->getMessage() );
+        }
+    }
+
+    public function update( string $UID, UpdateClientDto $params )
+    {
+        try {
+            $data = $this->search( $UID );
+            $dataDto = GetClientDto::parse( $data )->toArray();
+            
+            $dataDto = mergeIfDifferent( $dataDto, $params );
+            $response = $this->client->request( 'POST', '/api/v1/clients/' . $UID . '/update', [
+                'json' => $dataDto
+            ]);
+
+            $responseBody = json_decode( $response->getBody()->getContents(), true );
+            return $responseBody['Data'];
+        } catch ( \Exception $e ) {
+            throw new \Exception( $e->getMessage() );
+        }
+    }
+
+    public function delete( string $UID )
+    {
+        try {
+            $this->search( $UID );  //? Solo validar si el cliente existe
+            $response = $this->client->request( 'POST', '/api/v1/clients/destroy/' . $UID  );
+            $responseBody = json_decode( $response->getBody()->getContents(), true );
+
+            if ( $responseBody['response'] == 'error' ) {
+                throw new \Exception( $responseBody['message'] );
+            }
         } catch ( \Exception $e ) {
             throw new \Exception( $e->getMessage() );
         }

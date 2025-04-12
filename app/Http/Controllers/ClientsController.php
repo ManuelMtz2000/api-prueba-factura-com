@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\DTO\CreateClientDto;
+use App\DTO\UpdateClientDto;
 use App\Services\ClientsService;
 use Illuminate\Http\Request;
 
@@ -42,6 +43,25 @@ class ClientsController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => $data
+        ], 200);
+    }
+
+    public function update( string $UID, UpdateClientDto $params )
+    {
+        $params = UpdateClientDto::fromRequest( $this->request->all() );
+        $data = $this->clientsService->update( $UID, $params );
+        return response()->json([
+            'status' => 'success',
+            'data' => $data
+        ], 200);
+    }
+
+    public function delete( string $UID )
+    {
+        $this->clientsService->delete( $UID );
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Cliente eliminado correctamente'
         ], 200);
     }
 }

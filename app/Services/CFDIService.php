@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\DTO\CFDIDto;
+use App\DTO\CreateCFDIDto;
 use GuzzleHttp\Client;
 
 class CFDIService
@@ -39,6 +40,64 @@ class CFDIService
                 'data' => $responseBody['data'],
                 'total' => $responseBody['total']
             ];
+        } catch ( \Exception $e ) {
+            throw new \Exception( $e->getMessage() );
+        }
+    }
+
+    public function add( CreateCFDIDto $params )
+    {
+        try {
+            $response = $this->client->request( 'POST', '/api/v4/cfdi40/create', [
+                'json' => $params->jsonSerialize()
+            ]);
+            
+            $responseBody = json_decode( $response->getBody()->getContents(), true );
+
+            if ( $responseBody['response'] == 'error' ) {
+                throw new \Exception( $responseBody['message'] );
+            }
+
+            $data = [
+                'UUID' => $responseBody['UUID'],
+                'message' => $responseBody['message']
+            ];
+
+            return $data;
+        } catch ( \Exception $e ) {
+            throw new \Exception( $e->getMessage() );
+        }
+    }
+
+    public function cancel( string $UUID, array $params ) {
+        try {
+            $response = $this->client->request( 'POST', '/api/v4/cfdi40/' . $UUID . '/cancel', [
+                'json' => $params
+            ]);
+
+            $responseBody = json_decode( $response->getBody()->getContents(), true );
+            
+            if ( $responseBody['response'] == 'error' ) {
+                throw new \Exception( $responseBody['message'] );
+            }
+
+            return $responseBody['message'];
+        } catch ( \Exception $e ) {
+            throw new \Exception( $e->getMessage() );
+        }
+    }
+
+    public function sendEmail( string $UUID )
+    {
+        try {
+            $response = $this->client->request( 'GET', '/api/v4/cfdi40/' . $UUID . '/email' );
+            $responseBody = json_decode( $response->getBody()->getContents(), true );
+
+            if ( $responseBody['response'] == 'error' ) {
+                throw new \Exception( $responseBody['message'] );
+            }
+            
+            return $responseBody['message'];
         } catch ( \Exception $e ) {
             throw new \Exception( $e->getMessage() );
         }
