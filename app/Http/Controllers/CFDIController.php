@@ -54,4 +54,13 @@ class CFDIController extends Controller
             'data' => $data
         ], 200);
     }
+
+    public function lastCfdi( string $UUID )
+    {
+        $data = $this->cfdiService->lastCfdi( $UUID );
+        return response()->json([
+            'status' => 'success',
+            'data' => $data
+        ], 200);
+    }
 }

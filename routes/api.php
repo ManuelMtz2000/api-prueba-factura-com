@@ -14,3 +14,7 @@ Route::prefix('clients')->group( function () {
 Route::prefix('cfdi')->group( function () {
     require __DIR__.'/modules/cfdi.php';
 });
+
+Route::prefix('catalogs')->group( function () {
+    require __DIR__.'/modules/catalogs.php';
+});

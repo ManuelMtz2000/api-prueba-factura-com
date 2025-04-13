@@ -5,6 +5,7 @@ namespace App\Services;
 use App\DTO\CFDIDto;
 use App\DTO\CreateCFDIDto;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Log;
 
 class CFDIService
 {
@@ -53,9 +54,8 @@ class CFDIService
             ]);
             
             $responseBody = json_decode( $response->getBody()->getContents(), true );
-
             if ( $responseBody['response'] == 'error' ) {
-                throw new \Exception( $responseBody['message'] );
+                throw new \Exception( $responseBody['message']['message'] );
             }
 
             $data = [
@@ -65,6 +65,7 @@ class CFDIService
 
             return $data;
         } catch ( \Exception $e ) {
+            Log::info( $e->getMessage() );
             throw new \Exception( $e->getMessage() );
         }
     }
@@ -98,6 +99,17 @@ class CFDIService
             }
             
             return $responseBody['message'];
+        } catch ( \Exception $e ) {
+            throw new \Exception( $e->getMessage() );
+        }
+    }
+
+    public function lastCfdi( string $UUID )
+    {
+        try {
+            $response = $this->client->request( 'GET', 'admin/cancelation/filter/last/40/F/' . $UUID );
+            $responseBody = json_decode( $response->getBody()->getContents(), true );
+            return $responseBody['data'];
         } catch ( \Exception $e ) {
             throw new \Exception( $e->getMessage() );
         }
